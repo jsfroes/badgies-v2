@@ -20,17 +20,33 @@
     <div class="container">
       <div class="row">
         <div class="col-sm-8 mt-3">
-          <h4>User already in the database</h4>
+          <h4>User already in the database! Would you like to update?</h4>
+        </div>
+      </div>
+      <hr />
+      <div>
+        <h4>User: <%= name %></h2>
+        <h4>Role: <%= role %></p>
 
-          <!-- <form
+        <% badges.forEach(function(badge) { %>
+        <img src="<%= badge %>" alt="badge" />
+        <% }); %>
+      </div>
+      <hr />
+      <form
             class="mt-4"
-            action="/create"
+            action="/user-updated"
             method="POST"
             enctype="multipart/form-data"
           >
             <div class="form-group">
               <label for="name">Twitch Name</label></br>
-              <input type="text" name="name" id="name" /></br></br>
+              <input type="text" name="name" id="name" value="<%= name %>"/></br></br>
+               <label for="role">Choose the role:</label>
+               <select id="role" name="role" value="<%= role %>">
+                 <option value="SE_Staff">SE_Staff</option>
+                 <option value="DreamTeam">DeamTeam</option>
+                </select></br></br>
               <label for="file">Badges</label></br>
               <input
                 type="file"
@@ -41,10 +57,7 @@
               />
             </div>
             <button type="submit" class="btn btn-primary">Submit</button>
-          </form> -->
-        </div>
-      </div>
-      <hr />
+          </form>
       <div class="row">
         <div class="col-sm-12">
           <div class="preview-images"></div>

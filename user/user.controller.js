@@ -5,6 +5,10 @@ const upload = require("../helper/helper").upload;
 const vm = require("v-response");
 const path = require("path");
 
+let name;
+let badges;
+let role;
+
 exports.create = async (req, res, next) => {
   if (!req.files || _.isEmpty(req.files)) {
     return res
@@ -44,12 +48,14 @@ exports.create = async (req, res, next) => {
       const foundUser = await user_model.findOne({ name: req.body.name });
 
       if (foundUser) {
-        return res.render("pages/update", {
-          name: req.body.name,
-          role: req.body.role,
-          multiple_image: req.body.multiple_image,
+        name = foundUser.name;
+        role = foundUser.role;
+        badges = foundUser.multiple_image;
+        return res.render("pages/user", {
+          name,
+          role,
+          badges,
         });
-        
       } else {
         let new_user = new user_model(bodyw);
         await new_user
@@ -61,7 +67,7 @@ exports.create = async (req, res, next) => {
             return res.json(error);
           });
 
-        return res.render(`pages/success.html`, {});
+        return res.render(`pages/success`, {});
       }
     }
     if (!urls) {
@@ -82,4 +88,58 @@ exports.find = (req, res, next) => {
       return res.status(200).json(vm.ApiResponse(true, 200, "", found));
     }
   });
+};
+exports.update = async (req, res, next) => {
+  if (!req.files || _.isEmpty(req.files)) {
+    return res
+      .status(400)
+      .json(vm.ApiResponse(false, 400, "No file uploaded'"));
+  }
+
+  const files = req.files;
+
+  // validate file quantity
+  if (req.files.length <= 0) {
+    return res
+      .status(400)
+      .send({ message: "You must select at least 1 file." });
+  }
+
+  try {
+    let urls = [];
+    let multiple = async (path) => await upload(path);
+    for (const file of files) {
+      const { path } = file;
+      console.log("path", file);
+
+      const newPath = await multiple(path);
+      urls.push(newPath);
+      fs.unlinkSync(path);
+    }
+    if (urls) {
+      let body = req.body;
+
+      let bodyw = _.extend(body, {
+        name: req.body.name,
+        multiple_image: urls,
+        role: req.body.role,
+      });
+
+      user_model
+        .findOneAndUpdate({ name: req.body.name }, bodyw)
+        .then((saved) => {
+          console.log(saved);
+          return res.render(`pages/updated`, {});
+        })
+        .catch((error) => {
+          return res.json(error);
+        });
+    }
+    if (!urls) {
+      return res.status(400).json(vm.ApiResponse(false, 400, ""));
+    }
+  } catch (e) {
+    console.log("err :", e);
+    return next(e);
+  }
 };

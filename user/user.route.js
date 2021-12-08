@@ -3,6 +3,7 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 const homeController = require("../controllers/home");
+const userController = require("../controllers/user");
 const updateController = require("../controllers/update");
 
 let storage = multer.diskStorage({
@@ -24,7 +25,12 @@ let upload = multer({
 });
 
 router.get("/", homeController.getHome);
-router.get("/update-user", updateController.getTest);
+router.get("/user", userController.getUser);
+router.post(
+  "/user-updated",
+  upload.array("multiple_image", 10),
+  user_controller.update
+);
 router.post(
   "/create",
   upload.array("multiple_image", 10),
