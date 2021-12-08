@@ -20,7 +20,7 @@ function upload(file) {
           reject(err);
         } else {
           console.log("cloudinary res:", res);
-          return resolve(res.url);
+          return resolve(res.secure_url);
         }
       }
     );
