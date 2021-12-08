@@ -3,7 +3,7 @@ const multer = require("multer");
 const express = require("express");
 const router = express.Router();
 const homeController = require("../controllers/home");
-const updateController = require("../controllers/test");
+const updateController = require("../controllers/update");
 
 let storage = multer.diskStorage({
   destination: function (req, file, callback) {

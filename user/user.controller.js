@@ -3,6 +3,7 @@ const _ = require("underscore");
 const fs = require("fs");
 const upload = require("../helper/helper").upload;
 const vm = require("v-response");
+const path = require("path");
 
 exports.create = async (req, res, next) => {
   if (!req.files || _.isEmpty(req.files)) {
@@ -34,8 +35,6 @@ exports.create = async (req, res, next) => {
     if (urls) {
       let body = req.body;
 
-  
-
       let bodyw = _.extend(body, {
         name: req.body.name,
         multiple_image: urls,
@@ -45,19 +44,24 @@ exports.create = async (req, res, next) => {
       const foundUser = await user_model.findOne({ name: req.body.name });
 
       if (foundUser) {
-        return res.redirect("/update-user");
+        return res.render("pages/update", {
+          name: req.body.name,
+          role: req.body.role,
+          multiple_image: req.body.multiple_image,
+        });
+        
       } else {
         let new_user = new user_model(bodyw);
         await new_user
           .save()
           .then((saved) => {
-            return res.json(saved);
+            console.log(saved);
           })
           .catch((error) => {
             return res.json(error);
           });
 
-        console.log(body);
+        return res.render(`pages/success.html`, {});
       }
     }
     if (!urls) {
