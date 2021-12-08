@@ -28,6 +28,6 @@ router.post(
   upload.array("multiple_image", 10),
   user_controller.create
 );
-router.get("/find", user_controller.find);
+router.get("/find/:user", user_controller.find);
 
 module.exports = router;

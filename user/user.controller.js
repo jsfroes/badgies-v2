@@ -34,7 +34,7 @@ exports.create = async (req, res, next) => {
     if (urls) {
       let body = req.body;
 
-      let bodyw = _.extend(body, { name: req.body.user, multiple_image: urls });
+      let bodyw = _.extend(body, { name: req.body.name, multiple_image: urls });
       let new_user = new user_model(bodyw);
       await new_user
         .save()
@@ -57,7 +57,7 @@ exports.create = async (req, res, next) => {
 };
 
 exports.find = (req, res, next) => {
-  user_model.find().then((found) => {
+  user_model.findOne({ name: req.params.user }).then((found) => {
     if (!found) {
       return res.status(400).json(vm.ApiResponse(false, 400, ""));
     }
