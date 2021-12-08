@@ -34,18 +34,31 @@ exports.create = async (req, res, next) => {
     if (urls) {
       let body = req.body;
 
-      let bodyw = _.extend(body, { name: req.body.name, multiple_image: urls });
-      let new_user = new user_model(bodyw);
-      await new_user
-        .save()
-        .then((saved) => {
-          return res.json(saved);
-        })
-        .catch((error) => {
-          return res.json(error);
-        });
+  
 
-      console.log(body);
+      let bodyw = _.extend(body, {
+        name: req.body.name,
+        multiple_image: urls,
+        role: req.body.role,
+      });
+
+      const foundUser = await user_model.findOne({ name: req.body.name });
+
+      if (foundUser) {
+        return res.redirect("/update-user");
+      } else {
+        let new_user = new user_model(bodyw);
+        await new_user
+          .save()
+          .then((saved) => {
+            return res.json(saved);
+          })
+          .catch((error) => {
+            return res.json(error);
+          });
+
+        console.log(body);
+      }
     }
     if (!urls) {
       return res.status(400).json(vm.ApiResponse(false, 400, ""));
