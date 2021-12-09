@@ -37,5 +37,7 @@ router.post(
   user_controller.create
 );
 router.get("/find/:user", user_controller.find);
+router.get("/findAll/", user_controller.findAll);
+
 
 module.exports = router;

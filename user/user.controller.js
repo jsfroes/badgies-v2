@@ -124,6 +124,17 @@ exports.find = (req, res, next) => {
     }
   });
 };
+
+exports.findAll = (req, res, next) => {
+  user_model.find({}).then((found) => {
+    if (!found) {
+      return res.status(400).json(vm.ApiResponse(false, 400, ""));
+    }
+    if (found) {
+      return res.status(200).json(vm.ApiResponse(true, 200, "", found));
+    }
+  });
+};
 exports.update = async (req, res, next) => {
   // if (!req.files || _.isEmpty(req.files)) {
   //   return res
