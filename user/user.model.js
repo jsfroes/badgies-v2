@@ -5,6 +5,9 @@ const userSchema = new Schema({
   name: {
     type: String,
   },
+  query: {
+    type: String,
+  },
   multiple_image: {
     type: [],
   },
