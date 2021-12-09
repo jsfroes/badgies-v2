@@ -27,10 +27,13 @@
       <div>
         <h4>User: <%= name %></h2>
         <h4>Role: <%= role %></p>
-
+        <% if (badges) { %>    
         <% badges.forEach(function(badge) { %>
         <img src="<%= badge %>" alt="badge" />
         <% }); %>
+        <% } else { %>
+        <h4>No badges found for this user</h4>
+        <% } %>
       </div>
       <hr />
       <form

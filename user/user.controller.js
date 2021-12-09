@@ -10,54 +10,84 @@ let badges;
 let role;
 
 exports.create = async (req, res, next) => {
-  if (!req.files || _.isEmpty(req.files)) {
-    return res
-      .status(400)
-      .json(vm.ApiResponse(false, 400, "No file uploaded'"));
-  }
-
-  const files = req.files;
+  // if (!req.files || _.isEmpty(req.files)) {
+  //   return res
+  //     .status(400)
+  //     .json(vm.ApiResponse(false, 400, "No file uploaded'"));
+  // }
 
   // validate file quantity
-  if (req.files.length <= 0) {
-    return res
-      .status(400)
-      .send({ message: "You must select at least 1 file." });
-  }
+  // if (req.files.length <= 0) {
+  //   return res
+  //     .status(400)
+  //     .send({ message: "You must select at least 1 file." });
+  // }
 
   try {
-    let urls = [];
-    let multiple = async (path) => await upload(path);
-    for (const file of files) {
-      const { path } = file;
-      console.log("path", file);
+    if (req.files) {
+      const files = req.files;
+      let urls = [];
+      let multiple = async (path) => await upload(path);
+      for (const file of files) {
+        const { path } = file;
+        console.log("path", file);
 
-      const newPath = await multiple(path);
-      urls.push(newPath);
-      fs.unlinkSync(path);
-    }
-    if (urls) {
-      let body = req.body;
+        const newPath = await multiple(path);
+        urls.push(newPath);
+        fs.unlinkSync(path);
+      }
+      if (urls) {
+        let body = req.body;
 
-      let bodyw = _.extend(body, {
-        name: req.body.name,
-        multiple_image: urls,
-        role: req.body.role,
-      });
+        let bodyw = _.extend(body, {
+          name: req.body.name,
+          multiple_image: urls,
+          role: req.body.role,
+        });
 
+        const foundUser = await user_model.findOne({ name: req.body.name });
+
+        if (foundUser) {
+          name = foundUser.name;
+          role = foundUser.role;
+          badges = foundUser.multiple_image;
+          return res.render("pages/user", {
+            name,
+            role,
+            badges,
+          });
+        } else {
+          let new_user = new user_model(bodyw);
+          await new_user
+            .save()
+            .then((saved) => {
+              console.log(saved);
+            })
+            .catch((error) => {
+              return res.json(error);
+            });
+
+          return res.render(`pages/success`, {});
+        }
+      }
+      if (!urls) {
+        return res.status(400).json(vm.ApiResponse(false, 400, ""));
+      }
+    } else {
       const foundUser = await user_model.findOne({ name: req.body.name });
 
       if (foundUser) {
         name = foundUser.name;
         role = foundUser.role;
-        badges = foundUser.multiple_image;
         return res.render("pages/user", {
           name,
           role,
-          badges,
         });
       } else {
-        let new_user = new user_model(bodyw);
+        let new_user = new user_model({
+          name: req.body.name,
+          role: req.body.role,
+        });
         await new_user
           .save()
           .then((saved) => {
@@ -69,9 +99,6 @@ exports.create = async (req, res, next) => {
 
         return res.render(`pages/success`, {});
       }
-    }
-    if (!urls) {
-      return res.status(400).json(vm.ApiResponse(false, 400, ""));
     }
   } catch (e) {
     console.log("err :", e);
